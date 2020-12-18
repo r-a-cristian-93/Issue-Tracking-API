@@ -1,21 +1,18 @@
-package rest.tickets;
+package rest.db.models;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Column;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.JoinColumn;
-import org.springframework.context.annotation.Scope;
-import lombok.*;
-import rest.options.DepartmentModel;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import lombok.*;
+import rest.db.models.*;
 
 @Entity
 @Table(name="tickets")
@@ -26,22 +23,26 @@ public class TicketModel {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="ID")
-	private Long id;
+	private Integer id;
 	@Column(name="summary")
 	private String summary;
 	@Column(name="issue")
 	private String issue;
-	@Column(name="status")
-	private String status;
-	@Column(name="opened_by")
-	private Integer openedBy;
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
+	@JoinColumn(name="status")
+	private StatusModel status;
+	@ManyToOne
+	@JoinColumn(name="opened_by")
+	private UserModel openedBy;	
+	@ManyToOne
+	@JoinColumn(name="assigned_to")
+	private UserModel assignedTo;
+	@ManyToOne
+	@JoinColumn(name="closed_by")
+	private UserModel closedBy;
+	@ManyToOne
 	@JoinColumn(name = "concerned_department")
 	private DepartmentModel concernedDepartment;
-	@Column(name="assigned_to")
-	private Integer assignedTo;
-	@Column(name="closed_by")
-	private Integer closedBy;
 	
 	protected TicketModel() {}
 	
