@@ -1,4 +1,4 @@
-# Issue-Tracking-Application
+# Issue-Tracking-Application-API
 
 This is the Issue tracking application API which has user based access with ROLES:</br>
  - User - Can create new tickets.</br>
