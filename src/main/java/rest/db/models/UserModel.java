@@ -28,6 +28,10 @@ public class UserModel{
 	private String email;
 	@Column(name="password")
 	private String password;
+	@Column(name="lastname")
+	private String lastname;
+	@Column(name="firstname")
+	private String firstname;
 	@ManyToOne
 	@JoinColumn(name="department")
 	private DepartmentModel department;

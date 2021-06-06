@@ -22,12 +22,8 @@ public class UserManagementController {
 	@ResponseBody
 	@PostMapping("/register")
 	@PreAuthorize("hasAuthority(T(rest.ApplicationConstants).ROLE_OWNER)")
-	public void registerUser(String username, String password, String department, String role ) {
-		UserModel userModel = UserModel.getInstance();
-		userModel.setEmail(username);
-		userModel.setPassword(pwdEncoder.encode(password));
-		userModel.setDepartment(DepartmentModel.getInstance(department));
-		userModel.setRole(RoleModel.getInstance(role));
+	public void registerUser(@RequestBody UserModel userModel) {
+		userModel.setPassword(pwdEncoder.encode(userModel.getPassword()));
 		usersRepo.save(userModel);
 	}
 	
