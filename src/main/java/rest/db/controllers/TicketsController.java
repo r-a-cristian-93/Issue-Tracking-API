@@ -123,7 +123,6 @@ public class TicketsController {
 	public TicketDetailsProjection closeTicket(
 				@PathVariable Integer id,
 				@RequestBody StatusModel status) {
-		//get closedBy from User bean from JWT
 		UserModel closedBy = getUserFromContext();
 		TicketModel ticket = ticketsRepo.getOne(id);
 		ticket.setClosedBy(closedBy);
