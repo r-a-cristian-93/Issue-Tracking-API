@@ -96,14 +96,9 @@ public class TicketsController {
 		
 	@ResponseBody
 	@PostMapping("/add")
-	public void insertTicket(String summary, String issue, String concernedDepartment) {
-		DepartmentModel department = departmentsRepo.findByValue(concernedDepartment);
+	public void insertTicket(@RequestBody TicketModel ticket) {
 		UserModel openedBy = getUserFromContext();
-		TicketModel ticket = TicketModel.getInstance();
-		ticket.setOpenedBy(openedBy);
-		ticket.setSummary(summary);
-		ticket.setIssue(issue);	
-		ticket.setConcernedDepartment(department);		
+		ticket.setOpenedBy(openedBy);			
 		ticketsRepo.save(ticket);
 	}	
 	
