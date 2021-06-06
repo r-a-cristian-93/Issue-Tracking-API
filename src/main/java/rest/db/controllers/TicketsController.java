@@ -112,6 +112,7 @@ public class TicketsController {
 		TicketModel ticket = ticketsRepo.getOne(id);
 		ticket.setAssignedTo(assignTo);
 		ticket.setStatus(statusModel);
+		ticket.setClosedBy(null);
 		ticketsRepo.save(ticket);
 		return ticketsRepo.findById(id, TicketDetailsProjection.class).get(0);
 	}
