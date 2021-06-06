@@ -107,11 +107,10 @@ public class TicketsController {
 	@PreAuthorize("hasAnyAuthority(T(rest.ApplicationConstants).ROLE_MODERATOR, T(rest.ApplicationConstants).ROLE_OWNER)")
 	public TicketDetailsProjection assignTo(
 				@PathVariable Integer id,
-				@RequestParam Integer assignTo) {
-		UserModel admin = usersRepo.getOne(assignTo);
+				@RequestBody UserModel assignTo) {
 		StatusModel statusModel = StatusModel.getInstance("Pending");
 		TicketModel ticket = ticketsRepo.getOne(id);
-		ticket.setAssignedTo(admin);
+		ticket.setAssignedTo(assignTo);
 		ticket.setStatus(statusModel);
 		ticketsRepo.save(ticket);
 		return ticketsRepo.findById(id, TicketDetailsProjection.class).get(0);
@@ -122,13 +121,12 @@ public class TicketsController {
 	@PreAuthorize("hasAnyAuthority(T(rest.ApplicationConstants).ROLE_ADMIN, T(rest.ApplicationConstants).ROLE_MODERATOR, T(rest.ApplicationConstants).ROLE_OWNER)")
 	public TicketDetailsProjection closeTicket(
 				@PathVariable Integer id,
-				@RequestParam String status) {
+				@RequestBody StatusModel status) {
 		//get closedBy from User bean from JWT
-		UserModel closedBy = usersRepo.getOne(1);
-		StatusModel statusModel = statusRepo.findByValue(status);
+		UserModel closedBy = getUserFromContext();
 		TicketModel ticket = ticketsRepo.getOne(id);
 		ticket.setClosedBy(closedBy);
-		ticket.setStatus(statusModel);
+		ticket.setStatus(status);
 		ticketsRepo.save(ticket);
 		return ticketsRepo.findById(id, TicketDetailsProjection.class).get(0);
 	}
@@ -148,7 +146,7 @@ public class TicketsController {
 	
 	private int decideCase(Object A, Object B) {
 		if (A!=null && B==null) return 1;	//A
-		if (A==null && B!=null) return 2;	//A
+		if (A==null && B!=null) return 2;	//B
 		if (A!=null && B!=null) return 3;	//both
 		return 4;							//none				
 	}
