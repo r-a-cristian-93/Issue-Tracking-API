@@ -43,7 +43,7 @@ public class OptionsController {
 	@ResponseBody
 	@GetMapping("/admins")	
 	@PreAuthorize("hasAnyAuthority(T(rest.ApplicationConstants).ROLE_MODERATOR, T(rest.ApplicationConstants).ROLE_OWNER)")
-	public List<UserIdEmailProjection> getAdmins() {
+	public List<UserModel> getAdmins() {
 		UserModel userModel = getUserFromContext();		
 		RoleModel roleModel = RoleModel.getInstance(ROLE_ADMIN);
 		if(!userModel.getRole().getValue().equals(ROLE_OWNER)) {

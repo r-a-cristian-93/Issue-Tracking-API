@@ -26,16 +26,11 @@ public class UserManagementController {
 		userModel.setPassword(pwdEncoder.encode(userModel.getPassword()));
 		usersRepo.save(userModel);
 	}
-	
+
 	@ResponseBody
 	@GetMapping("/myinfo")
-	public Map<String, Object> getMyInfo() {
-		UserModel user = getUserFromContext();
-		Map<String, Object> info = new LinkedHashMap<>();
-		info.put("id", user.getId());
-		info.put("email", user.getEmail());
-		info.put("role", user.getRole().getValue());
-		return info;
+	public UserModel getMyInfo() {
+		return usersRepo.findByEmail(getUserFromContext().getEmail());
 	}
 	
 	private UserModel getUserFromContext() {
