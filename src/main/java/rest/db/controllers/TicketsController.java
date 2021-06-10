@@ -29,7 +29,7 @@ public class TicketsController {
 	
 	@ResponseBody
 	@GetMapping("/manage")
-	public List<TicketDetailsProjection> getTickets(String status, String department) {
+	public List<TicketModel> getTickets(String status, String department) {
 		String userRole = getUserFromContext().getRole().getValue();
 		switch(userRole) {
 			case ROLE_OWNER: return ownerManagedTickets(status, department);
@@ -39,7 +39,7 @@ public class TicketsController {
 		}
 	}
 
-	public List<TicketDetailsProjection> ownerManagedTickets(String status, String department) {
+	public List<TicketModel> ownerManagedTickets(String status, String department) {
 		StatusModel statusModel = StatusModel.getInstance(status);
 		DepartmentModel departmentModel = DepartmentModel.getInstance(department);
 		switch (decideCase(status, department)) {
@@ -51,7 +51,7 @@ public class TicketsController {
 		}
 	}
 
-	public List<TicketDetailsProjection> moderatorManagedTickets(String status, String department) {
+	public List<TicketModel> moderatorManagedTickets(String status, String department) {
 		DepartmentModel concernedDepartment= getUserFromContext().getDepartment();		
 		StatusModel statusModel = StatusModel.getInstance(status);
 		DepartmentModel departmentModel = DepartmentModel.getInstance(department);
@@ -64,7 +64,7 @@ public class TicketsController {
 		}
 	}
 	
-	public List<TicketDetailsProjection> adminManagedTickets(String status, String department) {
+	public List<TicketModel> adminManagedTickets(String status, String department) {
 		UserModel assignedTo = getUserFromContext();		
 		StatusModel statusModel = StatusModel.getInstance(status);
 		DepartmentModel departmentModel = DepartmentModel.getInstance(department);
@@ -85,7 +85,7 @@ public class TicketsController {
 		
 	@ResponseBody
 	@GetMapping("/mytickets") 
-	public List<TicketDetailsProjection> getMyTickets(String status) {		
+	public List<TicketModel> getMyTickets(String status) {		
 		UserModel userModel = getUserFromContext();
 		if(status!=null) {
 			StatusModel statusModel = StatusModel.getInstance(status);
@@ -105,7 +105,7 @@ public class TicketsController {
 	@ResponseBody
 	@PutMapping("/{id}/update")
 	@PreAuthorize("hasAnyAuthority(T(rest.ApplicationConstants).ROLE_MODERATOR, T(rest.ApplicationConstants).ROLE_OWNER)")
-	public TicketDetailsProjection assignTo(
+	public TicketModel assignTo(
 				@PathVariable Integer id,
 				@RequestBody UserModel assignTo) {
 		StatusModel statusModel = StatusModel.getInstance("Pending");
@@ -114,13 +114,13 @@ public class TicketsController {
 		ticket.setStatus(statusModel);
 		ticket.setClosedBy(null);
 		ticketsRepo.save(ticket);
-		return ticketsRepo.findById(id, TicketDetailsProjection.class).get(0);
+		return ticketsRepo.findById(id, TicketModel.class).get(0);
 	}
 	
 	@ResponseBody
 	@PutMapping("/{id}/close")
 	@PreAuthorize("hasAnyAuthority(T(rest.ApplicationConstants).ROLE_ADMIN, T(rest.ApplicationConstants).ROLE_MODERATOR, T(rest.ApplicationConstants).ROLE_OWNER)")
-	public TicketDetailsProjection closeTicket(
+	public TicketModel closeTicket(
 				@PathVariable Integer id,
 				@RequestBody StatusModel status) {
 		UserModel closedBy = getUserFromContext();
@@ -128,7 +128,7 @@ public class TicketsController {
 		ticket.setClosedBy(closedBy);
 		ticket.setStatus(status);
 		ticketsRepo.save(ticket);
-		return ticketsRepo.findById(id, TicketDetailsProjection.class).get(0);
+		return ticketsRepo.findById(id, TicketModel.class).get(0);
 	}
 	
 	@ResponseBody

@@ -11,6 +11,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.JoinColumn;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import lombok.*;
 import rest.db.models.*;
 
@@ -26,6 +28,7 @@ public class UserModel{
 	private Integer id;
 	@Column(name="email")
 	private String email;
+	@JsonProperty(access = Access.WRITE_ONLY)
 	@Column(name="password")
 	private String password;
 	@Column(name="lastname")

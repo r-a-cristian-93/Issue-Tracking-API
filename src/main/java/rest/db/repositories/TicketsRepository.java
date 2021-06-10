@@ -12,24 +12,24 @@ public interface TicketsRepository extends JpaRepository<TicketModel, Integer> {
 	@Query(value = "SELECT status, COUNT(*) count from tickets WHERE opened_by=?1 GROUP BY status ORDER BY status ASC;", nativeQuery=true)
 	List<TicketCountProjection> countTickets(Integer openedBy);
 
-	List<TicketDetailsProjection> findByOpenedBy(UserModel openedBy);
-	List<TicketDetailsProjection> findByOpenedByAndStatus(UserModel openedBy, StatusModel status);
+	List<TicketModel> findByOpenedBy(UserModel openedBy);
+	List<TicketModel> findByOpenedByAndStatus(UserModel openedBy, StatusModel status);
 	
 	//for OWNER
-	List<TicketDetailsProjection> findByStatus(StatusModel status);
-	List<TicketDetailsProjection> findByOpenedByDepartment(DepartmentModel department);
-	List<TicketDetailsProjection> findByOpenedByDepartmentAndStatus(DepartmentModel department, StatusModel status);
-	List<TicketDetailsProjection> findBy();
+	List<TicketModel> findByStatus(StatusModel status);
+	List<TicketModel> findByOpenedByDepartment(DepartmentModel department);
+	List<TicketModel> findByOpenedByDepartmentAndStatus(DepartmentModel department, StatusModel status);
+	List<TicketModel> findBy();
 
 	//for MODERATOR
-	List<TicketDetailsProjection> findByConcernedDepartmentAndStatus(DepartmentModel concernedDep, StatusModel status);
-	List<TicketDetailsProjection> findByConcernedDepartmentAndOpenedByDepartment(DepartmentModel concernedDep, DepartmentModel openedByDep);
-	List<TicketDetailsProjection> findByConcernedDepartmentAndOpenedByDepartmentAndStatus(DepartmentModel concernedDep, DepartmentModel openedByDep, StatusModel status);
-	List<TicketDetailsProjection> findByConcernedDepartment(DepartmentModel department);
+	List<TicketModel> findByConcernedDepartmentAndStatus(DepartmentModel concernedDep, StatusModel status);
+	List<TicketModel> findByConcernedDepartmentAndOpenedByDepartment(DepartmentModel concernedDep, DepartmentModel openedByDep);
+	List<TicketModel> findByConcernedDepartmentAndOpenedByDepartmentAndStatus(DepartmentModel concernedDep, DepartmentModel openedByDep, StatusModel status);
+	List<TicketModel> findByConcernedDepartment(DepartmentModel department);
 	
 	//for ADMIN
-	List<TicketDetailsProjection> findByAssignedToAndStatus(UserModel assignedTo, StatusModel status);
-	List<TicketDetailsProjection> findByAssignedToAndOpenedByDepartment(UserModel assignedTo, DepartmentModel department);
-	List<TicketDetailsProjection> findByAssignedToAndOpenedByDepartmentAndStatus(UserModel assignedTo, DepartmentModel department, StatusModel status);
-	List<TicketDetailsProjection> findByAssignedTo(UserModel assignedTo);
+	List<TicketModel> findByAssignedToAndStatus(UserModel assignedTo, StatusModel status);
+	List<TicketModel> findByAssignedToAndOpenedByDepartment(UserModel assignedTo, DepartmentModel department);
+	List<TicketModel> findByAssignedToAndOpenedByDepartmentAndStatus(UserModel assignedTo, DepartmentModel department, StatusModel status);
+	List<TicketModel> findByAssignedTo(UserModel assignedTo);
 }
