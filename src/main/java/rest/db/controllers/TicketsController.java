@@ -6,6 +6,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -14,6 +16,7 @@ import lombok.*;
 import rest.db.models.*;
 import rest.db.projections.*;
 import rest.db.repositories.*;
+import rest.util.Context;
 
 import static rest.ApplicationConstants.*;
 
@@ -30,7 +33,7 @@ public class TicketsController {
 	@ResponseBody
 	@GetMapping("/manage")
 	public List<TicketModel> getTickets(String status, String department) {
-		String userRole = getUserFromContext().getRole().getValue();
+		String userRole = Context.getUser().getRole().getValue();
 		switch(userRole) {
 			case ROLE_OWNER: return ownerManagedTickets(status, department);
 			case ROLE_MODERATOR: return moderatorManagedTickets(status, department);
@@ -52,7 +55,7 @@ public class TicketsController {
 	}
 
 	public List<TicketModel> moderatorManagedTickets(String status, String department) {
-		DepartmentModel concernedDepartment= getUserFromContext().getDepartment();		
+		DepartmentModel concernedDepartment= Context.getUser().getDepartment();		
 		StatusModel statusModel = StatusModel.getInstance(status);
 		DepartmentModel departmentModel = DepartmentModel.getInstance(department);
 		switch (decideCase(status, department)) {
@@ -65,7 +68,7 @@ public class TicketsController {
 	}
 	
 	public List<TicketModel> adminManagedTickets(String status, String department) {
-		UserModel assignedTo = getUserFromContext();		
+		UserModel assignedTo = Context.getUser();		
 		StatusModel statusModel = StatusModel.getInstance(status);
 		DepartmentModel departmentModel = DepartmentModel.getInstance(department);
 		switch (decideCase(status, department)) {
@@ -80,13 +83,13 @@ public class TicketsController {
 	@ResponseBody
 	@GetMapping("/count")
 	public List<TicketCountProjection> countTickets() {
-		return ticketsRepo.countTickets(getUserFromContext().getId());		
+		return ticketsRepo.countTickets(Context.getUser().getId());		
 	}
 		
 	@ResponseBody
 	@GetMapping("/mytickets") 
 	public List<TicketModel> getMyTickets(String status) {		
-		UserModel userModel = getUserFromContext();
+		UserModel userModel = Context.getUser();
 		if(status!=null) {
 			StatusModel statusModel = StatusModel.getInstance(status);
 			return ticketsRepo.findByOpenedByAndStatus(userModel, statusModel);
@@ -97,12 +100,11 @@ public class TicketsController {
 	@ResponseBody
 	@PostMapping("/add")
 	public void insertTicket(@RequestBody TicketModel ticket) {
-		UserModel openedBy = getUserFromContext();
+		UserModel openedBy = Context.getUser();
 		ticket.setOpenedBy(openedBy);			
 		ticketsRepo.save(ticket);
 	}	
 	
-	@ResponseBody
 	@PutMapping("/{id}/update")
 	@PreAuthorize("hasAnyAuthority(T(rest.ApplicationConstants).ROLE_MODERATOR, T(rest.ApplicationConstants).ROLE_OWNER)")
 	public TicketModel assignTo(
@@ -110,11 +112,11 @@ public class TicketsController {
 				@RequestBody UserModel assignTo) {
 		StatusModel statusModel = StatusModel.getInstance("Pending");
 		TicketModel ticket = ticketsRepo.getOne(id);
+		assignTo = usersRepo.findById(assignTo.getId()).get();
 		ticket.setAssignedTo(assignTo);
 		ticket.setStatus(statusModel);
 		ticket.setClosedBy(null);
-		ticketsRepo.save(ticket);
-		return ticketsRepo.findById(id, TicketModel.class).get(0);
+		return ticketsRepo.save(ticket);
 	}
 	
 	@ResponseBody
@@ -123,12 +125,11 @@ public class TicketsController {
 	public TicketModel closeTicket(
 				@PathVariable Integer id,
 				@RequestBody StatusModel status) {
-		UserModel closedBy = getUserFromContext();
+		UserModel closedBy = Context.getUser();
 		TicketModel ticket = ticketsRepo.getOne(id);
 		ticket.setClosedBy(closedBy);
 		ticket.setStatus(status);
-		ticketsRepo.save(ticket);
-		return ticketsRepo.findById(id, TicketModel.class).get(0);
+		return ticketsRepo.save(ticket);
 	}
 	
 	@ResponseBody
@@ -137,11 +138,6 @@ public class TicketsController {
 	public void deleteTicket(@PathVariable Integer id) {
 		TicketModel ticket = ticketsRepo.getOne(id);
 		ticketsRepo.delete(ticket);
-	}	
-
-	private UserModel getUserFromContext() {
-		String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		return usersRepo.findByEmail(email);
 	}
 	
 	private int decideCase(Object A, Object B) {

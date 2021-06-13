@@ -10,6 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import rest.db.models.*;
 import rest.db.repositories.*;
 import rest.db.projections.*;
+import rest.util.Context;
 import java.util.*;
 
 import static rest.ApplicationConstants.*;
@@ -38,22 +39,17 @@ public class OptionsController {
 	@GetMapping("/status")
 	public Iterable<StatusModel> getStatus() {
 		return statusRepo.findAll();
-	}	
+	}
 		
 	@ResponseBody
 	@GetMapping("/admins")	
 	@PreAuthorize("hasAnyAuthority(T(rest.ApplicationConstants).ROLE_MODERATOR, T(rest.ApplicationConstants).ROLE_OWNER)")
 	public List<UserModel> getAdmins() {
-		UserModel userModel = getUserFromContext();		
+		UserModel userModel = Context.getUser();
 		RoleModel roleModel = RoleModel.getInstance(ROLE_ADMIN);
 		if(!userModel.getRole().getValue().equals(ROLE_OWNER)) {
 			return usersRepo.findByRoleAndDepartment(roleModel, userModel.getDepartment());
 		}		
 		return usersRepo.findByRole(roleModel);
-	}		
-	
-	private UserModel getUserFromContext() {
-		String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		return usersRepo.findByEmail(email);
-	} 
+	}
 }
