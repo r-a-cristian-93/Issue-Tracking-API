@@ -9,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import rest.db.models.*;
 import rest.db.repositories.*;
 import rest.db.projections.*;
+import rest.util.Context;
 import java.util.*;
 import lombok.*;
 
@@ -30,11 +31,6 @@ public class UserManagementController {
 	@ResponseBody
 	@GetMapping("/myinfo")
 	public UserModel getMyInfo() {
-		return usersRepo.findByEmail(getUserFromContext().getEmail());
-	}
-	
-	private UserModel getUserFromContext() {
-		String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		return usersRepo.findByEmail(email);
+		return Context.getUser();
 	}
 }
